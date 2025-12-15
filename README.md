@@ -47,3 +47,4 @@ The app automatically sorts tools into **Free** or **Paid** categories based on 
 
 MIT
 # newsve
+# adeded
