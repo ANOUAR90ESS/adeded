@@ -285,31 +285,33 @@ const ToolInsightModal: React.FC<ToolInsightModalProps> = ({ tool, initialTab = 
                            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-6">
                                <h3 className="text-2xl font-bold text-white mb-2">{course.title}</h3>
                                <div className="flex gap-4 text-sm text-zinc-400 mb-6">
-                                   <span>{course.modules.length} Modules</span>
-                                   <span>~{course.totalDurationHours} Hours</span>
+                                   <span>{course.modules?.length || 0} Modules</span>
+                                   <span>~{course.totalDurationHours || 0} Hours</span>
                                </div>
-                               <button 
+                               <button
                                    onClick={() => setIsPlayingCourse(true)}
                                    className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
                                >
                                    <Play className="w-5 h-5 fill-current" /> Start Learning
                                </button>
                            </div>
-                           
-                           <div>
-                               <h4 className="text-sm font-bold text-zinc-500 uppercase mb-3">Curriculum</h4>
-                               <div className="space-y-2">
-                                   {course.modules.map((mod, i) => (
-                                       <div key={i} className="bg-zinc-900/50 p-4 rounded-lg border border-zinc-800 flex justify-between items-center">
-                                           <div>
-                                               <div className="text-xs text-indigo-400 font-bold mb-1">MODULE {i+1}</div>
-                                               <div className="text-white font-medium">{mod.title}</div>
+
+                           {course.modules && course.modules.length > 0 && (
+                               <div>
+                                   <h4 className="text-sm font-bold text-zinc-500 uppercase mb-3">Curriculum</h4>
+                                   <div className="space-y-2">
+                                       {course.modules.map((mod, i) => (
+                                           <div key={i} className="bg-zinc-900/50 p-4 rounded-lg border border-zinc-800 flex justify-between items-center">
+                                               <div>
+                                                   <div className="text-xs text-indigo-400 font-bold mb-1">MODULE {i+1}</div>
+                                                   <div className="text-white font-medium">{mod.title}</div>
+                                               </div>
+                                               <div className="text-xs text-zinc-500">{mod.lessons?.length || 0} Lessons</div>
                                            </div>
-                                           <div className="text-xs text-zinc-500">{mod.lessons.length} Lessons</div>
-                                       </div>
-                                   ))}
+                                       ))}
+                                   </div>
                                </div>
-                           </div>
+                           )}
                        </div>
                    )}
                </div>
