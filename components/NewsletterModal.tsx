@@ -85,8 +85,7 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({ delay = 5000 }) => {
           toast.success('🎉 Successfully subscribed to our newsletter!');
         }
       } else {
-        // Fallback: Just save to localStorage if no DB
-        console.log('Newsletter subscription:', { email, categories: selectedCategories });
+        // Fallback: Just save to localStorage if no DB (no console logging for security)
         toast.success('🎉 Successfully subscribed! (Demo mode - no DB)');
       }
 

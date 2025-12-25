@@ -50,7 +50,7 @@ export const getCurrentUserProfile = async (): Promise<UserProfile | null> => {
 
   // EMERGENCY FALLBACK: If DB fetch fails but email matches admin list, grant admin
   if (error || !profile) {
-    console.warn("Error fetching profile, checking overrides:", error);
+    // Silently handle profile fetch errors for security (no console logging)
 
     // Get admin emails from environment
     const adminEmailsEnv = import.meta.env.VITE_ADMIN_EMAILS || process.env.VITE_ADMIN_EMAILS || '';

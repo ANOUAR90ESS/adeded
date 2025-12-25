@@ -16,14 +16,13 @@ const CookieConsent: React.FC = () => {
   const handleAccept = () => {
     localStorage.setItem('cookieConsent', 'accepted');
     setIsVisible(false);
-    // You can add analytics tracking here
-    console.log('Cookies accepted');
+    // Analytics tracking can be added here (no console logging for security)
   };
 
   const handleReject = () => {
     localStorage.setItem('cookieConsent', 'rejected');
     setIsVisible(false);
-    console.log('Cookies rejected');
+    // No console logging for security
   };
 
   if (!isVisible) return null;
