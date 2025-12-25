@@ -144,7 +144,17 @@ create table if not exists public.profiles (
 alter table public.profiles enable row level security;
 create policy "Public profiles are viewable by everyone." on public.profiles for select using ( true );
 create policy "Users can insert their own profile." on public.profiles for insert with check ( auth.uid() = id );
-create policy "Users can update own profile." on public.profiles for update using ( auth.uid() = id );
+-- SECURITY: Users can only update their own non-role fields (prevents privilege escalation)
+create policy "Users can update own profile (non-role fields)." on public.profiles for update using (
+  auth.uid() = id
+) with check (
+  -- Prevent users from changing their role field
+  (select role from public.profiles where id = auth.uid()) = role
+);
+-- Only admins can update any profile's role
+create policy "Only admins can update roles." on public.profiles for update using (
+  exists (select 1 from public.profiles where profiles.id = auth.uid() and profiles.role = 'admin')
+);
 
 -- TOOLS TABLE
 create table if not exists public.tools (
