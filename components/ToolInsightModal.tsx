@@ -14,9 +14,9 @@ interface ToolInsightModalProps {
 const ToolInsightModal: React.FC<ToolInsightModalProps> = ({ tool, initialTab = 'summary', onClose }) => {
   const [activeTab, setActiveTab] = useState<'summary' | 'slides' | 'tutorial' | 'course'>(initialTab);
   
-  // Initialize with saved data if available
-  const [slides, setSlides] = useState<Slide[]>(tool.slides || []);
-  const [tutorialContent, setTutorialContent] = useState<TutorialSection[]>(tool.tutorial || []);
+  // Initialize with saved data if available - ensure arrays are always defined
+  const [slides, setSlides] = useState<Slide[]>(Array.isArray(tool.slides) ? tool.slides : []);
+  const [tutorialContent, setTutorialContent] = useState<TutorialSection[]>(Array.isArray(tool.tutorial) ? tool.tutorial : []);
   const [course, setCourse] = useState<Course | null>(tool.course || null);
   
   const [loading, setLoading] = useState(false);
