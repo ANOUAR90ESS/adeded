@@ -32,7 +32,18 @@ export default defineConfig(({ mode }) => {
         }
       },
       build: {
-        sourcemap: true, // Enable source maps for Sentry
+        sourcemap: false, // SECURITY: Disable source maps in production (prevents code inspection)
+        minify: 'terser', // Use Terser for better minification and obfuscation
+        terserOptions: {
+          compress: {
+            drop_console: true, // Remove all console.log in production
+            drop_debugger: true, // Remove debugger statements
+          },
+          mangle: {
+            // Mangle variable names to make code harder to read
+            safari10: true,
+          },
+        },
       }
     };
 });
