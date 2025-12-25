@@ -7,7 +7,7 @@ import FeaturedHero from './FeaturedHero';
 import NewsFeed from './demos/NewsFeed';
 import Footer from './Footer';
 import GenericPage from './GenericPage';
-import PricingPage from './PricingPage';
+// import PricingPage from './PricingPage'; // REMOVED - App is now 100% free
 import ProfilePage from './ProfilePage';
 import AdUnit from './AdUnit';
 import { AppView, Tool, NewsArticle, UserProfile } from '../types';
@@ -605,8 +605,18 @@ const ClientLayout: React.FC<ClientLayoutProps> = ({
                 <GenericPage pageId={currentPageId} onBack={() => setCurrentView(AppView.HOME)} />
               )}
               
+              {/* Pricing view removed - App is now 100% free */}
               {currentView === AppView.PRICING && (
-                  <PricingPage user={user} onLoginRequest={() => setIsAuthModalOpen(true)} />
+                  <div className="text-center py-20">
+                    <h2 className="text-3xl font-bold text-white mb-4">🎉 VETORRE is 100% Free!</h2>
+                    <p className="text-zinc-400 mb-8">All features are now completely free with unlimited access.</p>
+                    <button
+                      onClick={() => setCurrentView(AppView.HOME)}
+                      className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500"
+                    >
+                      Explore Tools
+                    </button>
+                  </div>
               )}
 
               {currentView === AppView.PROFILE && (

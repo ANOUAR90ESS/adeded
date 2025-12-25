@@ -1,12 +1,19 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import ClientLayout from './components/ClientLayout';
-import AdminDashboard from './components/AdminDashboard';
 import AuthModal from './components/AuthModal';
 import NotFoundPage from './components/NotFoundPage';
-import PricingPage from './components/PricingPage';
-import PaymentSuccess from './components/PaymentSuccess';
+import LoadingFallback from './components/LoadingFallback';
+import CookieConsent from './components/CookieConsent';
+import NewsletterModal from './components/NewsletterModal';
+
+// Code-split large components for better performance
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+// Payment components removed - App is now 100% free
+// const PricingPage = lazy(() => import('./components/PricingPage')); // REMOVED
+// const PaymentSuccess = lazy(() => import('./components/PaymentSuccess')); // REMOVED
 import { AppView, Tool, NewsArticle, UserProfile } from './types';
 import { generateDirectoryTools } from './services/geminiService';
 import { 
@@ -239,38 +246,53 @@ const App: React.FC = () => {
   );
 
   return (
-    <HashRouter>
-      <Routes>
+    <>
+      <Toaster
+        position="top-right"
+        theme="dark"
+        richColors
+        closeButton
+        duration={4000}
+      />
+
+      {/* Cookie Consent Banner */}
+      <CookieConsent />
+
+      {/* Newsletter Subscription Modal - Shows after 5 seconds */}
+      <NewsletterModal delay={5000} />
+
+      <HashRouter>
+        <Routes>
         <Route path="/admin" element={
-            user?.role === 'admin' ? (
-               <AdminDashboard 
-                  tools={tools} 
-                  news={news}
-                  user={user}
-                  onAddTool={handleAddTool} 
-                  onUpdateTool={handleUpdateTool}
-                  onAddNews={handleAddNews} 
-                  onUpdateNews={handleUpdateNews}
-                  onDeleteTool={handleDeleteTool}
-                  onDeleteNews={handleDeleteNews}
-                  onBack={() => {}} 
-               />
-            ) : (
-                <div className="flex items-center justify-center h-screen bg-black text-white">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-4">Access Restricted</h2>
-                    <p className="mb-4 text-zinc-400">Please log in as an administrator to access this page.</p>
-                    <a href="/" className="bg-indigo-600 px-4 py-2 rounded hover:bg-indigo-500">Go to Home</a>
+            <Suspense fallback={<LoadingFallback />}>
+              {user?.role === 'admin' ? (
+                 <AdminDashboard
+                    tools={tools}
+                    news={news}
+                    user={user}
+                    onAddTool={handleAddTool}
+                    onUpdateTool={handleUpdateTool}
+                    onAddNews={handleAddNews}
+                    onUpdateNews={handleUpdateNews}
+                    onDeleteTool={handleDeleteTool}
+                    onDeleteNews={handleDeleteNews}
+                    onBack={() => {}}
+                 />
+              ) : (
+                  <div className="flex items-center justify-center h-screen bg-black text-white">
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold mb-4">Access Restricted</h2>
+                      <p className="mb-4 text-zinc-400">Please log in as an administrator to access this page.</p>
+                      <a href="/" className="bg-indigo-600 px-4 py-2 rounded hover:bg-indigo-500">Go to Home</a>
+                    </div>
                   </div>
-                </div>
-            )
+              )}
+            </Suspense>
         } />
         
-        {/* Payment Success Route */}
-        <Route path="/payment-success" element={<PaymentSuccess />} />
-
-        {/* Pricing Route */}
-        <Route path="/pricing" element={<PricingPage user={user} onLoginRequest={() => setIsAuthModalOpen(true)} />} />
+        {/* Payment routes removed - App is now 100% free */}
+        {/* <Route path="/payment-success" element={...} /> */}
+        {/* <Route path="/pricing" element={...} /> */}
 
         {/* Main App Routes */}
         <Route path="/" element={
@@ -297,7 +319,8 @@ const App: React.FC = () => {
         {/* 404 Catch-All */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </HashRouter>
+      </HashRouter>
+    </>
   );
 };
 

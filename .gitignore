@@ -21,6 +21,17 @@ dist-ssr
 .env.production
 .env.*
 env.d.tsx
+*.local
+
+# API Keys y Secrets - CRÍTICO: No subir
+**/secrets/
+**/*secret*
+**/*key*.json
+**/credentials.json
+**/*private*.json
+.pem
+.key
+*.p12
 
 # Editor directories and files
 .vscode/*
@@ -39,3 +50,54 @@ build/
 
 # OS files
 Thumbs.db
+
+# Vercel
+.vercel
+
+# Database & Backups
+*.sql.backup
+*.db
+*.sqlite
+*.sqlite3
+backup/
+dumps/
+
+# Sentry
+.sentryclirc
+sentry.properties
+
+# Archivos temporales
+*.tmp
+*.temp
+.cache/
+.temp/
+
+# Logs específicos
+error.log
+debug.log
+combined.log
+
+# NPM/Yarn
+.npm
+.yarn
+.pnp.*
+yarn.lock.backup
+
+# Tests
+coverage/
+.nyc_output/
+test-results/
+
+# Archivos de configuración local (no compartir)
+config.local.js
+config.local.ts
+supabase/.env
+
+# Archivos sensibles específicos de VETORRE
+# (Agrega aquí cualquier archivo que contenga datos privados)
+
+# NOTA: Descomenta las siguientes líneas SOLO si quieres ignorar estas carpetas
+# ⚠️ NO RECOMENDADO: public/ contiene ads.txt necesario para AdSense
+# ⚠️ NO RECOMENDADO: scripts/ contiene herramientas útiles de deployment
+# public/
+# scripts/

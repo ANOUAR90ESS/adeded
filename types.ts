@@ -1,7 +1,8 @@
 
 import { LiveServerMessage, Modality } from "@google/genai";
 
-export type UserPlan = 'free' | 'starter' | 'pro';
+// Payment system removed - App is now 100% free
+// export type UserPlan = 'free' | 'starter' | 'pro'; // REMOVED
 
 export interface Tool {
   id: string;
@@ -39,9 +40,10 @@ export interface UserProfile {
   id: string;
   email: string;
   role: 'user' | 'admin';
-  plan?: UserPlan;
-  subscriptionEnd?: string;
-  generationsCount?: number;
+  // Payment fields removed - App is now 100% free with unlimited access
+  // plan?: UserPlan; // REMOVED
+  // subscriptionEnd?: string; // REMOVED
+  // generationsCount?: number; // REMOVED
 }
 
 export enum AppView {

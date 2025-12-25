@@ -48,17 +48,20 @@ export const getCurrentUserProfile = async (): Promise<UserProfile | null> => {
     .eq('id', user.id)
     .single();
 
-  // EMERGENCY FALLBACK: If DB fetch fails but email matches owner, grant admin
+  // EMERGENCY FALLBACK: If DB fetch fails but email matches admin list, grant admin
   if (error || !profile) {
     console.warn("Error fetching profile, checking overrides:", error);
-    
-    if (user.email === 'anouares.seghyr91@gmail.com') {
+
+    // Get admin emails from environment
+    const adminEmailsEnv = import.meta.env.VITE_ADMIN_EMAILS || process.env.VITE_ADMIN_EMAILS || '';
+    const adminEmails = adminEmailsEnv.split(',').map((e: string) => e.trim()).filter(Boolean);
+
+    if (user.email && adminEmails.includes(user.email)) {
         return {
             id: user.id,
             email: user.email || '',
             role: 'admin',
-            plan: 'pro',
-            generationsCount: 0
+            // Payment fields removed - App is now 100% free
         };
     }
 
@@ -67,20 +70,19 @@ export const getCurrentUserProfile = async (): Promise<UserProfile | null> => {
       id: user.id,
       email: user.email || '',
       role: 'user',
-      plan: 'free',
-      generationsCount: 0
+      // Payment fields removed - App is now 100% free
     };
   }
 
   // Force admin for owner email if DB record exists but says user (safety check)
-  const role = (user.email === 'anouares.seghyr91@gmail.com') ? 'admin' : (profile.role as 'user' | 'admin');
+  const adminEmailsEnv = import.meta.env.VITE_ADMIN_EMAILS || process.env.VITE_ADMIN_EMAILS || '';
+  const adminEmails = adminEmailsEnv.split(',').map((e: string) => e.trim()).filter(Boolean);
+  const role = (user.email && adminEmails.includes(user.email)) ? 'admin' : (profile.role as 'user' | 'admin');
 
   return {
     id: user.id,
     email: user.email || '',
     role: role,
-    plan: profile.plan as any,
-    subscriptionEnd: profile.subscription_end,
-    generationsCount: profile.generations_count || 0
+    // Payment fields removed - App is now 100% free with unlimited access
   };
 };

@@ -1,5 +1,6 @@
 
 import { GoogleGenAI } from "@google/genai";
+import { checkRateLimit, getRateLimitHeaders, RATE_LIMITS } from '../utils/rateLimit';
 
 export default async function handler(req: any, res: any) {
   // CORS headers for handling cross-origin requests if needed
@@ -18,6 +19,23 @@ export default async function handler(req: any, res: any) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting - use IP address as identifier
+  const clientIp = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.socket.remoteAddress || 'unknown';
+  const rateLimitResult = checkRateLimit(`gemini:${clientIp}`, RATE_LIMITS.AI_GENERATION);
+
+  // Set rate limit headers
+  const headers = getRateLimitHeaders(rateLimitResult);
+  Object.entries(headers).forEach(([key, value]) => {
+    res.setHeader(key, value);
+  });
+
+  if (!rateLimitResult.allowed) {
+    return res.status(429).json({
+      error: 'Rate limit exceeded',
+      retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
+    });
   }
 
   try {
