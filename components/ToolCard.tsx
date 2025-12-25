@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { ExternalLink, Tag, Sparkles, BookOpen, Lock } from 'lucide-react';
+import { ExternalLink, Tag, Sparkles, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Tool, UserProfile } from '../types';
 import ToolInsightModal from './ToolInsightModal';
-import UpgradeModal from './UpgradeModal';
+// UpgradeModal removed - App is now 100% free
 
 interface ToolCardProps {
   tool: Tool;
@@ -25,25 +25,20 @@ const getCategoryBadgeClass = (category: string) => {
 
 const ToolCard: React.FC<ToolCardProps> = ({ tool, user }) => {
   const [showModal, setShowModal] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [initialTab, setInitialTab] = useState<'summary' | 'slides' | 'tutorial'>('summary');
   const navigate = useNavigate();
-  
+
   // Safety check for tags and slice for display
   const tags = tool.tags || [];
   const displayTags = tags.slice(0, 3);
   const remainingTags = tags.length - 3;
 
-  // Check if user has premium access (starter, pro, or admin)
-  const hasAccess = user && (user.role === 'admin' || user.plan === 'starter' || user.plan === 'pro');
+  // App is now 100% free - everyone has access!
+  const hasAccess = true;
 
   const openModal = (tab: 'summary' | 'slides' | 'tutorial') => {
       setInitialTab(tab);
       setShowModal(true);
-  };
-
-  const handleLockedClick = () => {
-      setShowUpgradeModal(true);
   };
 
   return (
@@ -87,27 +82,19 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, user }) => {
           
           <div className="mt-auto flex gap-2">
             <button
-               onClick={hasAccess ? () => openModal('slides') : handleLockedClick}
-               className={`flex-1 flex items-center justify-center gap-1.5 md:gap-2 py-2 md:py-2.5 rounded-lg text-xs font-medium transition-all shadow-lg ${
-                   hasAccess 
-                   ? 'bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700' 
-                   : 'bg-gradient-to-r from-indigo-600/10 to-purple-600/10 border border-indigo-500/30 text-indigo-300 hover:from-indigo-600 hover:to-purple-600 hover:text-white hover:border-transparent group/btn'
-               }`}
-               title={hasAccess ? "Generate Explainer Slides" : "Upgrade to unlock"}
+               onClick={() => openModal('slides')}
+               className="flex-1 flex items-center justify-center gap-1.5 md:gap-2 py-2 md:py-2.5 rounded-lg text-xs font-medium transition-all shadow-lg bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700"
+               title="Generate Explainer Slides"
             >
-              {hasAccess ? <Sparkles className="w-3 h-3 text-indigo-400" /> : <Lock className="w-3 h-3 group-hover/btn:text-white transition-colors" />}
+              <Sparkles className="w-3 h-3 text-indigo-400" />
               <span className="hidden md:inline">Explain</span>
             </button>
             <button
-               onClick={hasAccess ? () => openModal('tutorial') : handleLockedClick}
-               className={`flex-1 flex items-center justify-center gap-1.5 md:gap-2 py-2 md:py-2.5 rounded-lg text-xs font-medium transition-all border ${
-                   hasAccess
-                   ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700'
-                   : 'bg-gradient-to-r from-indigo-600/10 to-purple-600/10 border-indigo-500/30 text-indigo-300 hover:from-indigo-600 hover:to-purple-600 hover:text-white hover:border-transparent group/btn'
-               }`}
-               title={hasAccess ? "Generate AI Tutorial" : "Upgrade to unlock"}
+               onClick={() => openModal('tutorial')}
+               className="flex-1 flex items-center justify-center gap-1.5 md:gap-2 py-2 md:py-2.5 rounded-lg text-xs font-medium transition-all border bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700"
+               title="Generate AI Tutorial"
             >
-              {hasAccess ? <BookOpen className="w-3 h-3 text-purple-400" /> : <Lock className="w-3 h-3 group-hover/btn:text-white transition-colors" />}
+              <BookOpen className="w-3 h-3 text-purple-400" />
               <span className="hidden md:inline">Tutorial</span>
             </button>
             <a 
@@ -124,12 +111,6 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, user }) => {
       </div>
       
       {showModal && <ToolInsightModal tool={tool} initialTab={initialTab} onClose={() => setShowModal(false)} />}
-      
-      {/* Upgrade Modal for Locked Features */}
-      <UpgradeModal 
-        isOpen={showUpgradeModal} 
-        onClose={() => setShowUpgradeModal(false)} 
-      />
     </>
   );
 };
