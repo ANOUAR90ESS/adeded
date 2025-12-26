@@ -63,7 +63,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onExit }) =>
   const [mediaCache, setMediaCache] = useState<MediaCache>({});
   
   // Storage key based on course title
-  const storageKey = `course_progress_${course.title.replace(/\s+/g, '_').toLowerCase()}`;
+  const storageKey = `course_progress_${course.title ? course.title.replace(/\s+/g, '_').toLowerCase() : 'untitled'}`;
 
   // Track completed items
   const [completedItems, setCompletedItems] = useState<Set<string>>(() => {
@@ -80,8 +80,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onExit }) =>
     localStorage.setItem(storageKey, JSON.stringify(Array.from(completedItems)));
   }, [completedItems, storageKey]);
 
-  const activeModule = course.modules[activeModuleIndex];
-  const activeLesson = activeModule?.lessons[activeLessonIndex];
+  const activeModule = course.modules?.[activeModuleIndex];
+  const activeLesson = activeModule?.lessons?.[activeLessonIndex];
 
   // Completion Helpers
   const getItemId = (type: 'lesson' | 'exercises' | 'quiz' | 'script', mIndex: number, lIndex?: number) => {
@@ -112,13 +112,16 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onExit }) =>
 
   // Progress Calculations
   const getModuleStats = (mIndex: number) => {
-     const module = course.modules[mIndex];
+     const module = course.modules?.[mIndex];
+     if (!module) return { completed: 0, total: 0, percentage: 0 };
      const hasScript = !!module.videoScript;
-     const total = module.lessons.length + 2 + (hasScript ? 1 : 0);
+     const total = (module.lessons?.length || 0) + 2 + (hasScript ? 1 : 0);
      let completed = 0;
-     module.lessons.forEach((_, i) => {
-         if (isCompleted('lesson', mIndex, i)) completed++;
-     });
+     if (module.lessons) {
+       module.lessons.forEach((_, i) => {
+           if (isCompleted('lesson', mIndex, i)) completed++;
+       });
+     }
      if (isCompleted('exercises', mIndex)) completed++;
      if (isCompleted('quiz', mIndex)) completed++;
      if (hasScript && isCompleted('script', mIndex)) completed++;
@@ -128,11 +131,13 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onExit }) =>
   const getTotalProgress = () => {
       let total = 0;
       let completed = 0;
-      course.modules.forEach((_, i) => {
-          const stats = getModuleStats(i);
-          total += stats.total;
-          completed += stats.completed;
-      });
+      if (course.modules) {
+        course.modules.forEach((_, i) => {
+            const stats = getModuleStats(i);
+            total += stats.total;
+            completed += stats.completed;
+        });
+      }
       return total === 0 ? 0 : Math.round((completed / total) * 100);
   };
 
@@ -156,21 +161,21 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onExit }) =>
     }
 
     if (viewMode === 'lesson') {
-        if (activeLessonIndex < activeModule.lessons.length - 1) {
+        if (activeModule?.lessons && activeLessonIndex < activeModule.lessons.length - 1) {
             setActiveLessonIndex(prev => prev + 1);
         } else {
             setViewMode('exercises');
         }
     } else if (viewMode === 'exercises') {
         setViewMode('quiz');
-        setQuizAnswers(new Array(activeModule.quiz.questions.length).fill(-1));
+        setQuizAnswers(new Array(activeModule?.quiz?.questions?.length || 0).fill(-1));
         setQuizSubmitted(false);
     } else if (viewMode === 'quiz') {
-        if (activeModuleIndex < course.modules.length - 1) {
+        if (course.modules && activeModuleIndex < course.modules.length - 1) {
             const nextIndex = activeModuleIndex + 1;
             setActiveModuleIndex(nextIndex);
             setActiveLessonIndex(0);
-            setViewMode(course.modules[nextIndex].videoScript ? 'script' : 'lesson');
+            setViewMode(course.modules[nextIndex]?.videoScript ? 'script' : 'lesson');
         } else {
             alert("Course Completed! Congratulations.");
         }
@@ -229,10 +234,10 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onExit }) =>
       >
         <div className="h-full flex flex-col">
           <div className="p-4 border-b border-zinc-800 bg-zinc-950">
-            <h2 className="font-bold text-lg text-white leading-tight mb-2 truncate" title={course.title}>{course.title}</h2>
+            <h2 className="font-bold text-lg text-white leading-tight mb-2 truncate" title={course.title}>{course.title || 'Untitled Course'}</h2>
             <div className="flex items-center text-xs text-zinc-500 mb-3">
-               <span className="bg-indigo-900/50 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded mr-2">{course.modules.length} Modules</span>
-               <span>{course.totalDurationHours}h Total</span>
+               <span className="bg-indigo-900/50 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded mr-2">{course.modules?.length || 0} Modules</span>
+               <span>{course.totalDurationHours || 0}h Total</span>
             </div>
             
             {/* Overall Progress */}
@@ -248,7 +253,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onExit }) =>
           </div>
           
           <div className="flex-1 overflow-y-auto custom-scrollbar">
-            {course.modules.map((module, mIndex) => {
+            {course.modules && course.modules.map((module, mIndex) => {
               const { percentage } = getModuleStats(mIndex);
               return (
               <div key={mIndex} className="border-b border-zinc-800">
@@ -295,7 +300,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onExit }) =>
                         </button>
                     )}
 
-                    {module.lessons.map((lesson, lIndex) => {
+                    {module.lessons && module.lessons.map((lesson, lIndex) => {
                       const completed = isCompleted('lesson', mIndex, lIndex);
                       return (
                       <button
