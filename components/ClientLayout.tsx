@@ -530,18 +530,18 @@ const ClientLayout: React.FC<ClientLayoutProps> = ({
                     ))}
                   </div>
 
-                  {/* Top Ad Unit */}
-                  <AdUnit className="my-4" />
-
                   {showHomeDashboard ? (
                     <div className="space-y-16">
                       {/* Featured Hero Section */}
                       {featuredTool && (
-                         <FeaturedHero 
-                            tool={featuredTool} 
-                            onOpenDetails={() => setHeroToolModal(featuredTool)} 
+                         <FeaturedHero
+                            tool={featuredTool}
+                            onOpenDetails={() => setHeroToolModal(featuredTool)}
                          />
                       )}
+
+                      {/* Top Ad Unit - Moved below Featured Hero */}
+                      <AdUnit className="my-4" />
 
                       <CollectionSection 
                         title="Top Free & Freemium" 
