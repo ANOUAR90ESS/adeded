@@ -119,7 +119,18 @@ console.warn("Error fetching profile, checking overrides:", error);
 2. Open your VETORRE project
 3. Navigate to **SQL Editor** in the left sidebar
 
-### Step 2: Run Security SQL Script
+### Step 2: Run Database Migration (Remove Old Payment Fields)
+
+If upgrading from an older version that had payment features, first run the migration to clean up obsolete columns:
+
+1. Open the file `supabase_migration_remove_payment.sql` in your project
+2. Copy the entire contents
+3. Paste into Supabase SQL Editor and execute
+4. This will safely remove: `plan`, `subscription_end`, `generations_count` columns
+
+**Note:** This migration is safe to run multiple times (uses `DROP COLUMN IF EXISTS`).
+
+### Step 3: Run Security SQL Script
 
 Copy and paste the complete SQL schema from **AdminDashboard.tsx** (lines 130-210) into the SQL Editor and execute it.
 
@@ -148,7 +159,7 @@ create policy "Only admins can update roles."
   );
 ```
 
-### Step 3: Verify Policies
+### Step 4: Verify Policies
 
 Run this query to verify your RLS policies are active:
 
@@ -168,7 +179,7 @@ where tablename in ('profiles', 'tools', 'news');
 
 You should see all the security policies listed.
 
-### Step 4: Test Security
+### Step 5: Test Security
 
 1. Create a test user account (non-admin)
 2. Try to update the test user's role to 'admin' using Supabase client:
