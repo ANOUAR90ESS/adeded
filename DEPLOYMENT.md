@@ -45,6 +45,10 @@ Go to **Settings** → **Environment Variables** and add:
 ### Required Variables:
 
 ```bash
+# ⚠️ CRITICAL - Gemini API Key (for AI features)
+# Get from: https://aistudio.google.com/apikey
+GEMINI_API_KEY=AIzaSy...your-actual-key-here
+
 # Supabase
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
@@ -62,6 +66,19 @@ SENTRY_ORG=
 SENTRY_PROJECT=
 SENTRY_AUTH_TOKEN=
 ```
+
+**⚠️ IMPORTANT NOTES:**
+
+1. **GEMINI_API_KEY** is required for:
+   - Generating slides
+   - Creating tutorials
+   - Generating courses
+   - Creating images
+   - Creating videos (Veo)
+
+2. **Without GEMINI_API_KEY**, you'll get `500 Internal Server Error` when using AI features
+
+3. Get your Gemini API key from: https://aistudio.google.com/apikey
 
 **⚠️ NEVER commit these values to Git!**
 
@@ -206,6 +223,47 @@ git push
 1. Go to Vercel → Settings → Environment Variables
 2. Add ALL required variables from Step 2
 3. Redeploy the application
+
+---
+
+### Problem: 500 Error when using AI features (Slides, Tutorial, Course)
+
+**Error in Console:**
+```
+POST /api/gemini 500 (Internal Server Error)
+```
+
+**Cause:** `GEMINI_API_KEY` environment variable is missing or invalid.
+
+**Solution:**
+
+1. **Get your Gemini API Key:**
+   - Go to https://aistudio.google.com/apikey
+   - Click "Create API Key"
+   - Copy the key (starts with `AIzaSy...`)
+
+2. **Add to Vercel:**
+   - Go to Vercel Dashboard
+   - Your Project → Settings → Environment Variables
+   - Add new variable:
+     - **Name:** `GEMINI_API_KEY`
+     - **Value:** `AIzaSy...your-key-here`
+     - **Environment:** Production, Preview, Development (select all)
+
+3. **Redeploy:**
+   - Go to Deployments tab
+   - Click "Redeploy" on latest deployment
+   - Wait for deployment to finish
+
+4. **Test:**
+   - Try generating slides/tutorial/course again
+   - Should work now without 500 errors
+
+**Additional Checks:**
+
+- Verify the API key is valid (test in AI Studio)
+- Check Gemini API quotas aren't exceeded
+- Make sure key has correct permissions enabled
 
 ---
 
