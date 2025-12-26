@@ -130,16 +130,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const sqlSchema = `-- Enable UUID extension
 create extension if not exists "uuid-ossp";
 
--- PROFILES TABLE
+-- PROFILES TABLE (Cleaned - Payment fields removed, app is 100% free)
 create table if not exists public.profiles (
   id uuid references auth.users on delete cascade not null primary key,
   email text,
   role text default 'user' check (role in ('user', 'admin')),
-  plan text default 'free',
-  subscription_end timestamp with time zone,
-  generations_count integer default 0,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
+
+-- MIGRATION: Remove obsolete payment/subscription columns if they exist
+-- Run this separately if upgrading from old schema:
+-- ALTER TABLE public.profiles DROP COLUMN IF EXISTS plan;
+-- ALTER TABLE public.profiles DROP COLUMN IF EXISTS subscription_end;
+-- ALTER TABLE public.profiles DROP COLUMN IF EXISTS generations_count;
 
 alter table public.profiles enable row level security;
 create policy "Public profiles are viewable by everyone." on public.profiles for select using ( true );
